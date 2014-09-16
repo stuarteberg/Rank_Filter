@@ -7,20 +7,6 @@
 #include <iostream>
 #include <iterator>
 
-#define DISPLAY(X)  std::cout << #X << " = " << X << std::endl
-
-template <class T, class C>
-std::ostream& operator<<(std::ostream& out, const vigra::MultiArrayView<1, T, C>& that)
-{
-    std::ios::fmtflags flags = out.setf(std::ios::right |std::ios::fixed,std::ios::adjustfield |std::ios::floatfield);
-    for(vigra::MultiArrayIndex i = 0; i < that.size(); ++i)
-    {
-        out << that(i) << " ";
-    }
-    out << std::endl;
-    out.setf(flags);
-    return out;
-}
 
 template <class T1, class S1,
           class T2, class S2>
@@ -61,13 +47,6 @@ inline void lineRankOrderFilter(const vigra::MultiArrayView<1, T1, S1> & src,
 
     while ( window_begin < src.size() )
     {
-        std::cout << "sorted_window = ";
-        for (auto sorted_window_iter = sorted_window.begin(); sorted_window_iter != sorted_window.end(); sorted_window_iter++)
-        {
-            std::cout << *sorted_window_iter << " " ;
-        }
-        std::cout << std::endl;
-
         dest[window_begin] = *rank_point;
 
         typename std::multiset<T1>::iterator prev_iter(window_iters.front());
