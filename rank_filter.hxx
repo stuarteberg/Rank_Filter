@@ -10,6 +10,9 @@
 #include <utility>
 
 
+namespace vigra
+{
+
 template<unsigned int N,
         class T1, class S1,
         class T2, class S2>
@@ -173,4 +176,6 @@ inline void lineRankOrderFilter(const vigra::MultiArrayView <N, T1, S1> &src,
         unsigned int half_length, float rank, unsigned int axis = N - 1)
 {
     lineRankOrderFilterND(src, dest, half_length, rank, axis);
+}
+
 }
