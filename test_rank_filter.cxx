@@ -218,8 +218,6 @@ public:
     {
         expected_result_2 = array_2;
 
-        std::cout << "array_2 = " << array_2 << std::endl;
-
         result_2 = 0;
 
         lineRankOrderFilter(array_2, result_2, 0, 0.5);
@@ -230,8 +228,6 @@ public:
     void test_rank_filter_12()
     {
         expected_result_2 = reverse_array_2;
-
-        std::cout << "reverse_array_2 = " << reverse_array_2 << std::endl;
 
         result_2 = 0;
 
