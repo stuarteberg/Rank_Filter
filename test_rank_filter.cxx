@@ -39,12 +39,9 @@ public:
         {
             for (int j = 0; j < array_2.shape(1); j++)
             {
-                std::cout << i << ", " << j << std::endl;
-
                 array_2(i, j) = i + 2*j;
             }
         }
-        std::cout << std::endl;
 
         for (int i = 0; i < reverse_array_2.shape(0); i++)
         {
