@@ -164,7 +164,7 @@ inline void lineRankOrderFilterND(const vigra::MultiArrayView <N, T1, S1> &src,
             }
         }
 
-        done = !carry;
+        done = carry;
     }
 }
 
