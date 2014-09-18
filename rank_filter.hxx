@@ -119,6 +119,7 @@ inline void lineRankOrderFilterND(const vigra::MultiArrayView <N, T1, S1> &src,
             }
         }
     }
+    dest[window_begin] = *rank_point;
 }
 
 template<unsigned int N,
