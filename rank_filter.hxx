@@ -1,6 +1,7 @@
-#include <deque>
+#ifndef RANK_FILTER
+#define RANK_FILTER
+
 #include <vigra/multi_array.hxx>
-#include <vigra/linear_algebra.hxx>
 #include <set>
 #include <cmath>
 #include <cassert>
@@ -9,6 +10,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "sorted_vector.hxx"
 
 namespace vigra
 {
@@ -21,9 +23,6 @@ inline void lineRankOrderFilterND(const vigra::MultiArrayView <N, T1, S1> &src,
         vigra::MultiArrayView <N, T2, S2> dest,
         unsigned int half_length, float rank, unsigned int axis = 0)
 {
-    // Will ignore boundaries initially.
-    // Then will try adding reflection.
-
     // Rank must be in the range 0 to 1
     assert((0 <= rank) && (rank <= 1));
 
@@ -31,37 +30,33 @@ inline void lineRankOrderFilterND(const vigra::MultiArrayView <N, T1, S1> &src,
 
     // The position of the
     typename vigra::MultiArrayView<N, T1, S1>::difference_type_1 window_begin(0);
-    std::multiset<T1> sorted_window;
-    std::deque< typename std::multiset<T1>::iterator > window_iters;
+    SortedVector<T1> sorted_window;
 
     // Get the initial sorted window.
     // Include the reflection.
     for (typename vigra::MultiArrayView<N, T1, S1>::difference_type_1 j(half_length); j > 0; j--)
     {
-        window_iters.push_back(sorted_window.insert(src[window_begin + j]));
+        sorted_window.insert(src[window_begin + j]);
     }
+
     for (typename vigra::MultiArrayView<N, T1, S1>::difference_type_1 j(0); j <= half_length; j++)
     {
-        window_iters.push_back(sorted_window.insert(src[window_begin + j]));
+        sorted_window.insert(src[window_begin + j]);
     }
 
-    typename std::multiset<T1>::iterator rank_point = sorted_window.begin();
-
-    for (int i = 0; i < rank_pos; i++)
-    {
-        rank_point++;
-    }
-
-    typename std::multiset<T1>::iterator prev_iter;
     T1 prev_value;
     T1 next_value;
     while ( window_begin < src.size() )
     {
-        dest[window_begin] = *rank_point;
-
-        prev_iter = window_iters.front();
-        prev_value = *prev_iter;
-        window_iters.pop_front();
+        dest[window_begin] = sorted_window[rank_pos];
+        if ( window_begin < half_length )
+        {
+            prev_value = src[half_length - window_begin];
+        }
+        else
+        {
+            prev_value = src[window_begin - half_length];
+        }
 
         window_begin++;
 
@@ -74,52 +69,10 @@ inline void lineRankOrderFilterND(const vigra::MultiArrayView <N, T1, S1> &src,
             next_value = src[2 * src.size() - (window_begin + half_length + 2)];
         }
 
-        if ( ( *rank_point < prev_value ) && ( *rank_point <= next_value ) )
-        {
-            sorted_window.erase(prev_iter);
-            window_iters.push_back(sorted_window.insert(next_value));
-        }
-        else if ( ( *rank_point >= prev_value ) && ( *rank_point > next_value ) )
-        {
-            if ( rank_point == prev_iter )
-            {
-                window_iters.push_back(sorted_window.insert(next_value));
-                rank_point--;
-
-                sorted_window.erase(prev_iter);
-            }
-            else
-            {
-                sorted_window.erase(prev_iter);
-                window_iters.push_back(sorted_window.insert(next_value));
-            }
-        }
-        else if ( ( *rank_point < prev_value ) && ( *rank_point > next_value ) )
-        {
-            sorted_window.erase(prev_iter);
-            window_iters.push_back(sorted_window.insert(next_value));
-
-            rank_point--;
-        }
-        else if ( ( *rank_point >= prev_value ) && ( *rank_point <= next_value ) )
-        {
-            if (rank_point == prev_iter)
-            {
-                window_iters.push_back(sorted_window.insert(next_value));
-                rank_point++;
-
-                sorted_window.erase(prev_iter);
-            }
-            else
-            {
-                sorted_window.erase(prev_iter);
-                window_iters.push_back(sorted_window.insert(next_value));
-
-                rank_point++;
-            }
-        }
+        sorted_window.erase(prev_value);
+        sorted_window.insert(next_value);
     }
-    dest[window_begin] = *rank_point;
+    dest[window_begin] = sorted_window[rank_pos];
 }
 
 template<unsigned int N,
@@ -141,7 +94,7 @@ inline void lineRankOrderFilterND(const vigra::MultiArrayView <N, T1, S1> &src,
 
     vigra::MultiArray<N, T1> src_transposed(src.transpose(transposed_axes));
 
-    vigra::MultiArrayView<N, T1, S1> dest_transposed(dest.transpose(transposed_axes));
+    vigra::MultiArrayView<N, T2, S2> dest_transposed(dest.transpose(transposed_axes));
 
 
     typename vigra::MultiArrayView<N - 1, T1, S1>::difference_type pos;
@@ -182,3 +135,4 @@ inline void lineRankOrderFilter(const vigra::MultiArrayView <N, T1, S1> &src,
 }
 
 }
+#endif
