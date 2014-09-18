@@ -1,4 +1,5 @@
 #include "vigra/unittest.hxx"
+#include "vigra/timing.hxx"
 
 #include "rank_filter.hxx"
 
@@ -6,19 +7,19 @@ class RankFilterTest
 {
 private:
 
-    const unsigned long size = 10;
+    const unsigned long size = 10000000;
 
-    vigra::MultiArray< 1, double > array;
-    vigra::MultiArray< 1, double > reverse_array;
+    vigra::MultiArray< 1, float > array;
+    vigra::MultiArray< 1, float > reverse_array;
 
-    vigra::MultiArray< 1, double > expected_result;
-    vigra::MultiArray< 1, double > result;
+    vigra::MultiArray< 1, float > expected_result;
+    vigra::MultiArray< 1, float > result;
 
-    vigra::MultiArray< 2, double > array_2;
-    vigra::MultiArray< 2, double > reverse_array_2;
+    vigra::MultiArray< 2, float > array_2;
+    vigra::MultiArray< 2, float > reverse_array_2;
 
-    vigra::MultiArray< 2, double > expected_result_2;
-    vigra::MultiArray< 2, double > result_2;
+    vigra::MultiArray< 2, float > expected_result_2;
+    vigra::MultiArray< 2, float > result_2;
 
 public:
 
@@ -235,6 +236,38 @@ public:
 
         should(expected_result_2 == result_2);
     };
+
+    void test_rank_filter_13()
+    {
+        expected_result = array;
+
+        result = 0;
+
+        USETICTOC
+        TIC
+
+        lineRankOrderFilter(array, result, 400, 0.5);
+
+        TOC
+
+        should(expected_result == result);
+    };
+
+    void test_rank_filter_14()
+    {
+        expected_result = reverse_array;
+
+        result = 0;
+
+        USETICTOC
+        TIC
+
+        lineRankOrderFilter(reverse_array, result, 400, 0.5);
+
+        TOC
+
+        should(expected_result == result);
+    };
 };
 
 struct RankFilterTestSuite
@@ -243,18 +276,20 @@ struct RankFilterTestSuite
     RankFilterTestSuite()
             : vigra::test_suite("RankFilterTestSuite")
     {
-        add( testCase( &RankFilterTest::test_rank_filter_1 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_2 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_3 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_4 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_5 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_6 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_7 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_8 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_9 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_10 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_11 ) );
-        add( testCase( &RankFilterTest::test_rank_filter_12 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_1 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_2 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_3 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_4 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_5 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_6 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_7 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_8 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_9 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_10 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_11 ) );
+        //add( testCase( &RankFilterTest::test_rank_filter_12 ) );
+        add( testCase( &RankFilterTest::test_rank_filter_13 ) );
+        add( testCase( &RankFilterTest::test_rank_filter_14 ) );
     }
 }; // struct RankFilterTestSuite
 
